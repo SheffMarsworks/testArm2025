@@ -11,6 +11,10 @@
 #define MOTOR3_DIR 12 // Direction pin for motor 3
 #define HOME_SENSOR_PIN 3  // Home position sensor pin
 
+// enter the pin
+#define ENCODER_PWM_A 0
+#define ENCODER_PWM_B 0
+
 void setup() {
     pinMode(MOTOR1_PWM, OUTPUT);
     pinMode(MOTOR1_DIR, OUTPUT);
@@ -19,6 +23,11 @@ void setup() {
     pinMode(MOTOR3_PWM, OUTPUT);
     pinMode(MOTOR3_DIR, OUTPUT);
     pinMode(HOME_SENSOR_PIN, INPUT);
+
+    pinMode(ENCODER_PWM_A, INPUT);
+    pinMode(ENCODER_PWM_B, INPUT);
+
+
     Serial.begin(9600);
 }
 
@@ -103,7 +112,12 @@ void loop() {
 
 
 void oneMotorTest(){
-  
+
+}
+
+
+int getEncoderSignals(){
+  Serial.println(digitalRead(ENCODER_PWM_A));
 }
 
 

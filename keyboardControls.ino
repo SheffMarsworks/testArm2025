@@ -1,3 +1,5 @@
+int userDegrees = 0;
+
 void setup() {
   Serial.begin(9600); 
   Serial.println("Type a letter: ");
@@ -10,6 +12,11 @@ void loop() {
     int inputInteger = inputString.toInt(); // Convert the string to an integer
     Serial.print("You entered: ");
     Serial.println(inputInteger);
-    
+    userDegrees = inputInteger;
   }
+}
+
+
+int getUserInput(int userDegrees){
+  return userDegrees;
 }

@@ -16,6 +16,8 @@ void loop() {
     int inputInteger = inputString.toInt(); 
     Serial.print("Entered Value: ");
     Serial.println(inputInteger);
+
+    //Set motor power to getPIDCalculation
     
   }
 }
@@ -24,6 +26,8 @@ double getEncoderDegrees() {
 	return 0.0;
 }
 
+
+// all the necessary calculation to set the motor
 double getPIDCalculation(double kP,double kI,double kD, int setpoint){
   double currentValue = getEncoderDegrees(); //To be implemented
   double error = setpoint - currentValue;
