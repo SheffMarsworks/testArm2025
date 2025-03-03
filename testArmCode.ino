@@ -31,6 +31,8 @@ void setup() {
     Serial.begin(9600);
 }
 
+//we need to accellrate/deccelerate smooth
+
 // Function to control motor speed and direction
 void motor_control(int motor_ID, int direction, float speed, float acc) {
     int pwmValue = constrain(speed * 255 / 100, 0, 255);  // Convert speed (0-100%) to PWM
