@@ -4,7 +4,7 @@ const double kD = 0.0;
 
 const double setpoint = 100;
 
-
+/*
 void setup() {
   Serial.begin(9600); 
   Serial.println("Enter a degree from 0 to 90:");
@@ -20,7 +20,7 @@ void loop() {
     //Set motor power to getPIDCalculation
     
   }
-}
+}*/
 
 double getEncoderDegrees() {
 	return 0.0;

@@ -12,8 +12,14 @@
 #define HOME_SENSOR_PIN 3  // Home position sensor pin
 
 // enter the pin
-#define ENCODER_PWM_A 0
-#define ENCODER_PWM_B 0
+#define encoderPinA 0
+#define encoderPinB 0
+
+//The gearRatio of the motor gearbox
+const int gearRatio = 64; 
+
+volatile int encoderCount = 0; // Counter variable
+
 
 void setup() {
     pinMode(MOTOR1_PWM, OUTPUT);
@@ -24,8 +30,8 @@ void setup() {
     pinMode(MOTOR3_DIR, OUTPUT);
     pinMode(HOME_SENSOR_PIN, INPUT);
 
-    pinMode(ENCODER_PWM_A, INPUT);
-    pinMode(ENCODER_PWM_B, INPUT);
+    pinMode(encoderPinA, INPUT_PULLUP); // Set pins as input with internal pullup
+    pinMode(encoderPinB, INPUT_PULLUP);
 
 
     Serial.begin(9600);
@@ -84,6 +90,8 @@ int home_position() {
 
 // Main loop
 void loop() {
+
+    printEncoderSignals();
     //Controller inputs needs to be added
     motor_control(1, FORWARD, 50, 1.0);
     delay(2000);
@@ -110,6 +118,10 @@ void loop() {
         Serial.println("Motor is NOT in home position.");
     }
     delay(1000);
+
+
+
+    
 }
 
 
@@ -117,9 +129,35 @@ void oneMotorTest(){
 
 }
 
+double getEncoderDegrees(int rawSignals){
+  // 7 is the number of signals per rotation 
+  double rotations = (double) rawSignals / 7;
+
+  double outputRotation = rotations / (double) gearRatio;
+  double degrees = outputRotation * 360.0;
+
+  return degrees;
+}
+
 
 int getEncoderSignals(){
-  Serial.println(digitalRead(ENCODER_PWM_A));
+  int currentAState = digitalRead(encoderPinA);
+  int currentBState = digitalRead(encoderPinB);
+
+  if (currentAState == LOW && currentBState == HIGH) { // Check for rotation direction
+    encoderCount++; 
+
+  } else if (currentAState == HIGH && currentBState == LOW) {
+    encoderCount--;
+
+  }
+
+  return encoderCount;
+}
+
+void printEncoderSignals(){
+  Serial.println("RAW ENCODER SIGNALS: "+ (String)getEncoderSignals()+"\n");
+  Serial.println("DEGREES: " + (String) getEncoderDegrees()+"\n");
 }
 
 

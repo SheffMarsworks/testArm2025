@@ -1,9 +1,10 @@
 int userDegrees = 0;
-
+/*
 void setup() {
   Serial.begin(9600); 
   Serial.println("Type a letter: ");
 }
+
 
 void loop() {
   if (Serial.available() > 0) { // Check if data is available from the serial port
@@ -14,7 +15,7 @@ void loop() {
     Serial.println(inputInteger);
     userDegrees = inputInteger;
   }
-}
+}*/
 
 
 int getUserInput(int userDegrees){

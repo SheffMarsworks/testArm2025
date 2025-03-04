@@ -1,5 +1,5 @@
 // Define encoder pins
-
+/*
 const int encoderPinA = 2;
 
 const int encoderPinB = 3;
@@ -56,3 +56,4 @@ void checkEncoder() {
   lastAState = currentAState; // Update last state
 
 }
+*/
