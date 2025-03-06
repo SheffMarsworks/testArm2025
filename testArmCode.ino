@@ -132,7 +132,6 @@ void oneMotorTest(){
 double getEncoderDegrees(int rawSignals){
   // 7 is the number of signals per rotation 
   double rotations = (double) rawSignals / 7;
-
   double outputRotation = rotations / (double) gearRatio;
   double degrees = outputRotation * 360.0;
 
@@ -157,7 +156,7 @@ int getEncoderSignals(){
 
 void printEncoderSignals(){
   Serial.println("RAW ENCODER SIGNALS: "+ (String)getEncoderSignals()+"\n");
-  Serial.println("DEGREES: " + (String) getEncoderDegrees()+"\n");
+  Serial.println("DEGREES: " + (String) getEncoderDegrees(getEncoderSignals())+"\n");
 }
 
 
