@@ -3,22 +3,24 @@
 #define REVERSE 0
 
 // Motor driver pins (example configuration)
-#define MOTOR1_PWM 5  // PWM pin for motor 1
-#define MOTOR1_DIR 6  // Direction pin for motor 1
+#define MOTOR1_PWM 2  // PWM pin for motor 1
+#define MOTOR1_DIR 24  // Direction pin for motor 1
 #define MOTOR2_PWM 9  // PWM pin for motor 2
-#define MOTOR2_DIR 10 // Direction pin for motor 2
+#define MOTOR2_DIR 26 // Direction pin for motor 2
 #define MOTOR3_PWM 11 // PWM pin for motor 3
 #define MOTOR3_DIR 12 // Direction pin for motor 3
 #define HOME_SENSOR_PIN 3  // Home position sensor pin
 
 // enter the pin
-#define encoderPinA 0
-#define encoderPinB 0
+#define encoderPinA 31
+#define encoderPinB 40
 
 //The gearRatio of the motor gearbox
 const int gearRatio = 64; 
 
-volatile int encoderCount = 0; // Counter variable
+volatile int encoderCountAnalog; // Counter variable
+volatile int encoderDirection;
+
 
 
 void setup() {
@@ -33,8 +35,10 @@ void setup() {
     pinMode(encoderPinA, INPUT_PULLUP); // Set pins as input with internal pullup
     pinMode(encoderPinB, INPUT_PULLUP);
 
+    pinMode(A0, INPUT);
 
-    Serial.begin(9600);
+
+    Serial.begin(300);
 }
 
 //we need to accellrate/deccelerate smooth
@@ -42,6 +46,8 @@ void setup() {
 // Function to control motor speed and direction
 void motor_control(int motor_ID, int direction, float speed, float acc) {
     int pwmValue = constrain(speed * 255 / 100, 0, 255);  // Convert speed (0-100%) to PWM
+
+
 
     if (motor_ID == 1) {
         digitalWrite(MOTOR1_DIR, direction == FORWARD ? HIGH : LOW); // Set direction
@@ -91,12 +97,14 @@ int home_position() {
 // Main loop
 void loop() {
 
+  encoderCountAnalog = analogRead(A0);
+
     printEncoderSignals();
     //Controller inputs needs to be added
-    motor_control(1, FORWARD, 50, 1.0);
-    delay(2000);
-    motor_control(1, REVERSE, 30, 0.5);
-    delay(2000);
+    motor_control(2, FORWARD, 60, 1.0);
+    delay(5000);
+    /*motor_control(1, REVERSE, 30, 0.5);
+    delay(5000);
 
     motor_control(2, FORWARD, 50, 1.0);
     delay(2000);
@@ -110,7 +118,7 @@ void loop() {
 
     motor_angle_control(1, 90, 10, 1);
     motor_angle_control(2, 90, 10, 1);
-    motor_angle_control(3, 90, 10, 1);
+    motor_angle_control(3, 90, 10, 1);*/
 
     if (home_position() == 1) {
         Serial.println("Motor is in home position.");
@@ -118,8 +126,6 @@ void loop() {
         Serial.println("Motor is NOT in home position.");
     }
     delay(1000);
-
-
 
     
 }
@@ -144,19 +150,19 @@ int getEncoderSignals(){
   int currentBState = digitalRead(encoderPinB);
 
   if (currentAState == LOW && currentBState == HIGH) { // Check for rotation direction
-    encoderCount++; 
+    encoderDirection++; 
 
   } else if (currentAState == HIGH && currentBState == LOW) {
-    encoderCount--;
+    encoderDirection--;
 
   }
 
-  return encoderCount;
+  return encoderDirection;
 }
 
 void printEncoderSignals(){
-  Serial.println("RAW ENCODER SIGNALS: "+ (String)getEncoderSignals()+"\n");
-  Serial.println("DEGREES: " + (String) getEncoderDegrees(getEncoderSignals())+"\n");
+  Serial.println("RAW ENCODER SIGNALS: "+ (String)encoderCountAnalog+"\n");
+  Serial.println("DEGREES: " + (String) getEncoderDegrees(encoderCountAnalog)+"\n");
 }
 
 
