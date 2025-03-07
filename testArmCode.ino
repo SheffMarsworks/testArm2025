@@ -101,7 +101,7 @@ void loop() {
 
     printEncoderSignals();
     //Controller inputs needs to be added
-    motor_control(2, FORWARD, 60, 1.0);
+    motor_control(1, FORWARD, 60, 1.0);
     delay(5000);
     /*motor_control(1, REVERSE, 30, 0.5);
     delay(5000);
@@ -119,14 +119,6 @@ void loop() {
     motor_angle_control(1, 90, 10, 1);
     motor_angle_control(2, 90, 10, 1);
     motor_angle_control(3, 90, 10, 1);*/
-
-    if (home_position() == 1) {
-        Serial.println("Motor is in home position.");
-    } else {
-        Serial.println("Motor is NOT in home position.");
-    }
-    delay(1000);
-
     
 }
 
@@ -142,6 +134,14 @@ double getEncoderDegrees(int rawSignals){
   double degrees = outputRotation * 360.0;
 
   return degrees;
+}
+
+void checkHomePosition(){
+  if (home_position() == 1) {
+    Serial.println("Motor is in home position.");
+  } else {
+    Serial.println("Motor is NOT in home position.");
+  }
 }
 
 
@@ -164,5 +164,35 @@ void printEncoderSignals(){
   Serial.println("RAW ENCODER SIGNALS: "+ (String)encoderCountAnalog+"\n");
   Serial.println("DEGREES: " + (String) getEncoderDegrees(encoderCountAnalog)+"\n");
 }
+
+
+
+
+//PID algorithm trial
+void pidMotorAngleControl(int motor_ID, int setpoint, double currentPos, double kp, double ki, double kd) {
+  double error = setpoint - currentPos;
+  static double previousError[3] = {0, 0, 0};
+  static double integral[3] = {0, 0, 0};
+
+  int motorIndex = motor_ID - 1;
+
+  integral[motorIndex] += error;
+  integral[motorIndex] = constrain(integral[motorIndex], -1000, 1000);
+  double integralTerm = ki * integral[motorIndex];
+
+  double derivative = kd * (error - previousError[motorIndex]);
+
+  double pidOutput = kp * error + integralTerm + derivative;
+
+  int pwmOutput = constrain(pidOutput, -100, 100);
+
+  int direction = pwmOutput >= 0 ? 1 : 0; // Assuming 1 is FORWARD, 0 is BACKWARD
+  float speed = abs(pwmOutput);
+  motor_control(motor_ID, direction, speed, 0);
+  previousError[motorIndex] = error;
+}
+
+
+
 
 
