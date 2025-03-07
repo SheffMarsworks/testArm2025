@@ -1,3 +1,7 @@
+
+#include <Arduino.h>
+#include <RotaryEncoder.h>
+
 // Constants for motor control
 #define FORWARD 1
 #define REVERSE 0
@@ -16,11 +20,19 @@
 #define encoderPinB 40
 
 //The gearRatio of the motor gearbox
-const int gearRatio = 64; 
+const int gearRatio = 369; 
 
 volatile int encoderCountAnalog; // Counter variable
 volatile int encoderDirection;
 
+RotaryEncoder *encoder = nullptr;
+
+
+
+void checkPosition()
+{
+  encoder->tick(); // just call tick() to check the state.
+}
 
 
 void setup() {
@@ -31,14 +43,16 @@ void setup() {
     pinMode(MOTOR3_PWM, OUTPUT);
     pinMode(MOTOR3_DIR, OUTPUT);
     pinMode(HOME_SENSOR_PIN, INPUT);
-
-    pinMode(encoderPinA, INPUT_PULLUP); // Set pins as input with internal pullup
-    pinMode(encoderPinB, INPUT_PULLUP);
-
     pinMode(A0, INPUT);
 
+    encoder = new RotaryEncoder(encoderPinA, encoderPinB, RotaryEncoder::LatchMode::TWO03);
 
-    Serial.begin(300);
+  // register interrupt routine
+  attachInterrupt(digitalPinToInterrupt(encoderPinA), checkPosition, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(encoderPinB), checkPosition, CHANGE);
+
+
+    Serial.begin(115200);
 }
 
 //we need to accellrate/deccelerate smooth
@@ -99,12 +113,12 @@ void loop() {
 
   encoderCountAnalog = analogRead(A0);
 
-    printEncoderSignals();
-    //Controller inputs needs to be added
-    motor_control(1, FORWARD, 60, 1.0);
-    delay(5000);
-    /*motor_control(1, REVERSE, 30, 0.5);
-    delay(5000);
+  printEncoderSignals();
+  //Controller inputs needs to be added
+  motor_control(1, FORWARD, 60, 1.0);
+  delay(5000);
+  /*motor_control(1, REVERSE, 30, 0.5);
+  delay(5000);
 
     motor_control(2, FORWARD, 50, 1.0);
     delay(2000);
@@ -146,6 +160,22 @@ void checkHomePosition(){
 
 
 int getEncoderSignals(){
+  int currentAState = digitalRead(encoderPinA);
+  int currentBState = digitalRead(encoderPinB);
+
+  if (currentAState == LOW && currentBState == HIGH) { // Check for rotation direction
+    encoderDirection++; 
+
+  } else if (currentAState == HIGH && currentBState == LOW) {
+    encoderDirection--;
+
+  }
+
+  return encoderDirection;
+}
+
+
+int getEncoderSignalsPWM(){
   int currentAState = digitalRead(encoderPinA);
   int currentBState = digitalRead(encoderPinB);
 
