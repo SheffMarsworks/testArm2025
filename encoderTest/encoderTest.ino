@@ -3,8 +3,8 @@
 // ------------------------------------------------------------------------
 
 // Pins used for the encoder signals
-#define ENCODER_PIN_A 20  // Must be an interrupt-capable pin on Arduino Uno/Nano
-#define ENCODER_PIN_B 21  // Must be an interrupt-capable pin on Arduino Uno/Nano
+#define ENCODER_PIN_A 3  // Must be an interrupt-capable pin on Arduino Uno/Nano
+#define ENCODER_PIN_B 18  // Must be an interrupt-capable pin on Arduino Uno/Nano
 
 // Constants for motor control
 #define FORWARD 1
@@ -69,7 +69,7 @@ void setup() {
 // Example loop: print the encoder count & degrees every second
 void loop() {
 
-  motor_control(1, FORWARD, 60, 1.0);
+  motor_control(1, FORWARD, 2, 1.0);
   
   static unsigned long lastPrint = 0;
   unsigned long now = millis();
